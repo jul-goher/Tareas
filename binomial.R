@@ -16,7 +16,7 @@ while (x<23) {
     sum((gustos[8,2:14]) != gustos[x, 2:14]) -> up
     print(up)
     #x+1=x 
-    x <- x+2
+    x <- x+1
   }
 }
 #¿Cuáles son las dos personas más similares? ¿Cuáles son las más diferentes?
