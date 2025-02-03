@@ -1,0 +1,33 @@
+---
+title: "Práctica Genómica"
+author: "Julieta González"
+date: "2025-02-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducción
+
+
+```{r cars}
+summary(cars)
+```
+
+## Metodología
+
+
+
+
+##Resultados
+
+```{r pressure, echo=FALSE}
+
+
+
+```
+
+##Discusión 
+
