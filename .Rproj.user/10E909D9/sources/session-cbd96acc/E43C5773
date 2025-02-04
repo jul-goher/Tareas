@@ -3,7 +3,7 @@
     "path": "C:/Users/julie/OneDrive/Escritorio/R/Bioinformática/Tareas/Práctica 2.Rmd",
     "project_path": "Práctica 2.Rmd",
     "type": "r_markdown",
-    "hash": "3515276453",
+    "hash": "2314285633",
     "contents": "",
     "dirty": false,
     "created": 1738626979474.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "13,0",
-        "scrollLine": "5"
+        "cursorPosition": "17,0",
+        "scrollLine": "14"
     },
     "folds": "",
-    "lastKnownWriteTime": 1738628951,
+    "lastKnownWriteTime": 1738696488,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1738628951375,
+    "last_content_update": 1738696488625,
     "read_only": false,
     "read_only_alternatives": []
 }
