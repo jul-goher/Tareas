@@ -13,16 +13,110 @@ Los genes fueron recortados individualmente y se nombraron del 1-10. Una vez aco
 
 ![**Figura 1-2.** Acomodo y ennumeración de los genes](Imágenes/Imagen1y2.png)
 
+*Análisis*
+De acuerdo con los datos obtenidos durante la práctica, se realizó en R una gráfica de barras para los matches resultantes para cada gen y también para cada una de las secuencias, con el paquete de ggplot2 (Wickham, 2016). Posteriormente se realizó una regresión lineal entre la cantidad de matches y el tamaño de las subsecuencias. 
 
 ##Resultados
 
+En la búsqueda de la secuencia (corta o larga) correspondiente dentro  de cada gen, hubo muchas secuencias largas que no se encontraron debido a que no había coincidencia del patrón; generalmente se encontraba el patrón una vez en cada gen y casi no se repetía entre genes. Se pudieron localizar todas las secuencias cortas y, fue en las de menor longitud (bases), en las que se encontró un patrón de repetición mayor tanto en un mismo gen como en diferentes. 
 
 ```{r, echo=FALSE}
+#####################################################
+######       Gráfica de apariciones           #######
+#####################################################
 
+library(ggplot2)
 
+str(registro_lectura)
+as.character(registro_lectura$subsec)
+as.numeric(registro_lectura$apariciones, registro_lectura$tamaño)
+
+point_apar  
+
+par(mar=c(6,4,4,2))
+barplot(registro_lectura$apariciones, col = registro_lectura$tamaño, 
+        xlab = "Subsecuencias", ylab = "# de matches", 
+        names.arg = registro_lectura$subsec, main = "Lecturas", space = 1)
 
 
 ```
 
+
+```{r}
+############################################################
+######       Gráfica de secuencias por gen           #######
+############################################################
+sec_gen <- c(sum(registro_lectura$gen1),sum(registro_lectura$gen2),sum(registro_lectura$gen3),
+  sum(registro_lectura$gen4),sum(registro_lectura$gen5),sum(registro_lectura$gen6),
+  sum(registro_lectura$gen7),sum(registro_lectura$gen8),sum(registro_lectura$gen9),
+  sum(registro_lectura$gen10))
+
+genes <- c("Gen 1","Gen 2", "Gen 3","Gen 4","Gen 5","Gen 6","Gen 7","Gen 8","Gen 9", "Gen 10")
+
+names(sec_gen) <- genes
+sec_gen
+
+barplot(sec_gen, col = sec_gen, xlab = "Genes", ylab = "# de matches",
+        main = "Lecturas")
+```
+
+Requiere menos tiempo y resulta más fácil buscar las secuencias cortas que las largas, ya que en las largas podía coincidir con el patrón inicial, pero no con la secuencia completa. Esto dificulta la búsqueda de este tipo de secuencias, ya que era más fácil cometer un error de coincidencia debido a la gran cantidad de bases, pues fue difícil notar la diferencia entre tres o menos bases cuando estas no están seguidas.  
+Con respecto al tamaño de los genes no se ve que exista una relación con la cantidad de secuencias que se pueden hallar. El gen con mayor número de matches fue el 8, con un total de 76, lo que en un análisis real se podría interpretar como el de mayor expresión, dentro de esta lista de genes de referencia. 
+
+
+```{r}
+############################################################
+######                    Análisis                   #######
+############################################################
+analisis_1 <- lm(apariciones~tamaño, registro_lectura) #  Reg. lineal
+summary(analisis_1)
+plot(analisis_1)# Supuestos
+
+analisis_2 <- lm (apariciones ~ poly(tamaño,2) , data = registro_lectura) # Reg. cuadrada
+summary(analisis_2)
+plot(analisis_2) # Supuestos
+
+# Podemos cambiar o quit<r el titulo de la graf
+point_apar <- ggplot(registro_lectura, aes(x=tamaño , y=apariciones))+
+  geom_point(colour = registro_lectura$subsec) + theme_light() +
+  xlab("Longitud") + ylab("# de matches") +
+  ggtitle("Match de cada secuencia con respecto su longitud") + geom_smooth(method = lm, se=TRUE) 
+
+# stat_smooth(aes(), method = "lm", formula = y~poly(x,2), se=TRUE, size=1) 
+# Esta es de la reg.cuadra pero no sé cual vean mejor
+# Yo creo que en la lineal se cumplen más los supuestos. 
+
+point_apar
+```
+
 ##Discusión 
+El tamaño de las lecturas cortas y largas en secuenciación es relevante durante el mapeo ya que cada una tiene diferentes ventajas y desventajas. En un mapeo con lecturas cortas, el tiempo de procesamiento del mapeo es menor a comparación de lecturas largas, además de ser más barato (seqWell, 2024). Este tipo de lecturas resultan útiles para la técnica RNA-seq por su alta sensibilidad y capacidad de rendimiento para el mapeo de transcriptomas, además de que proveen una profundidad de cobertura alta, que a su vez permite la identificación precisa de variaciones genéticas como polimorfismos de un solo nucleótido (SNPs), y también son utilizadas para detectar pequeñas deleciones (CD Genomics, 2024). No obstante, una secuenciación en fragmentos cortos no es ideal para la reconstrucción del genoma ni para la detección de variantes genéticas estructurales, por lo que se opta por secuenciación de lectura larga para cumplir con este objetivo. Las lecturas largas son mejores para una reconstrucción de novo del genoma, además de que son más eficientes para abarcar secuencias repetitivas o complejas, reduciendo la cantidad de lecturas necesarias para mapear una región específica del genoma, y la identificación de isoformas en el transcriptoma, ofreciendo una mejor precisión en el mapeo en zonas difíciles (Amarasinghe, 2020).
+
+Típicamente se considera la longitud de un gen con su nivel de expresión. Aquellos de gran tamaño están ligados a conservación evolutiva mientras que a tamaños menores a una expresión más alta. A menor tamaño de la secuencia, más probable es encontrarla a lo largo del genoma (y en cada gen), por ende tiene mayor oportunidad de transcribirse (y hacerlo más veces) y percibirse en un análisis de expresión, además, las secuencias cortas suelen ser insuficientes para encontrar carga intrónica, característica asociada a genes conservados (Gorlova et al., 2014; Lopes et al., 2021).
+
+La expresión tiende a ser dependiente de la longitud de la secuencia mas no está libre de excepciones. El contexto del análisis es relevante para la interpretación de la información. En un organismo, la transcripción está sujeta a los intrones y exones, factores de transcripción y a las interacciones que tienen con sus próximos. Sharma et al. expone la regulación negativa de dinucleótidos TG/CA sobre la transcripción, donde incluso ante tamaño pequeño la expresión disminuye significativamente. Otro caso es el de Physcomitrella patens, organismo en el que los genes compactos tienen intrones cortos y son altamente expresados o los genes housekeeping en el ser humano que tienen esta misma condición (Eisenberg & Levanon, 2003; Stenøien, 2007).
+
+Las lecturas que aparecen múltiples veces en distintos  genes se catalogan como ambiguas y generan mapeos ambiguos. Este fenómeno puede encontrarse en la naturaleza principalmente en plantas por sus grandes genomas. Las duplicaciones, transposones y  pseudogenes o regiones altamente repetidas (ej. telómeros) son la causa más común de este tipo de eventos. Se recomienda para un buen mapeo asignar este tipo de lecturas a un sitio específico (Griffin, 2005; Liu et al., 2019).
+
+###Referencias
+Referencias 
+Amarasinghe, S.L., Su, S., Dong, X. et al. Opportunities and challenges in long-read sequencing data analysis. Genome Biol 21, 30 (2020). https://doi.org/10.1186/s13059-020-1935-5
+CD Genomics. (2024). Sequencing Read Length：Everything You Need to Know. CD Genomics - The Genomics Service Company. Consultado en https://www.cd-genomics.com/blog/sequencing-read-length-comprehensive/
+Eisenberg, E., & Levanon, E. Y. (2003). Human housekeeping genes are compact. Trends in Genetics, 19(7), 362-365. https://doi.org/10.1016/S0168-9525(03)00140-9
+Gorlova, O., Fedorov, A., Logothetis, C., Amos, C., & Gorlov, I. (2014). Genes with a large intronic burden show greater evolutionary conservation on the protein level. BMC Evolutionary Biology, 14, 50. https://doi.org/10.1186/1471-2148-14-50
+Griffin, V. joshuagryphon’s full-sized avatar J. (2005). Ambiguous read alignments. Github. https://github.com/joshuagryphon/plastid/blob/master/docs/source/concepts/multimappers.rst
+Liu, Y., Ma, Y., Salsman, E., Manthey, F. A., Elias, E. M., Li, X., & Yan, C. (2019). An enrichment method for mapping ambiguous reads to the reference genome for NGS analysis. Journal of Bioinformatics and Computational Biology, 17(06), 1940012. https://doi.org/10.1142/S0219720019400122
+Lopes, I., Altab, G., Raina, P., & de Magalhães, J. P. (2021). Gene Size Matters: An Analysis of Gene Length in the Human Genome. Frontiers in Genetics, 12. https://doi.org/10.3389/fgene.2021.559998
+seqWell. (2024). Short-Read Sequencing vs. Long-Read Sequencing: Which Technology is Right for Your Research?. seqWell. Consultado en https://seqwell.com/short-read-sequencing-vs-long-read-sequencing-which-technology-is-right-for-your-research/
+Sharma, V. K., Kumar, N., Brahmachari, S. K., & Ramachandran, S. (2007). Abundance of dinucleotide repeats and gene expression are inversely correlated: A role for gene function in addition to intron length. Physiological Genomics, 31(1), 96-103. https://doi.org/10.1152/physiolgenomics.00183.2006
+Stenøien, H. K. (2007). Compact genes are highly expressed in the moss Physcomitrella patens. Journal of Evolutionary Biology, 20(3), 1223-1229. https://doi.org/10.1111/j.1420-9101.2007.01301.x
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.Hijmans R (2023). _raster: Geographic Data Analysis and Modeling_. R package versión 3.6-26, https://CRAN.R-project.org/package=raster.
+
+###Contribuciones
+- Lilith. Recorte, acomodo de los genes e identificación de secuencias durante la práctica. Resultados y metodología.
+- Julieta.Recorte, acomodo de los genes e identificación de secuencias durante la práctica. Metodología y discusión. 
+- Blanca. Recorte, acomodo de los genes e identificación de secuencias durante la práctica. Discusión.
+
+
+
 
