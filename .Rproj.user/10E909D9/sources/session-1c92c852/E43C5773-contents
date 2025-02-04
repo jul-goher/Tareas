@@ -1,0 +1,37 @@
+---
+title: "Práctica Genómica"
+author: "Julieta González, Lilith Martinez y Blanca Osornio"
+date: "2025-02-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducción
+
+
+```{r cars}
+summary(cars)
+```
+
+## Metodología
+*Simulación de secuenciación*
+Los genes fueron recortados individualmente y se nombraron del 1-10. Una vez acomodados de manera lineal, se buscó cada lectura corta y larga dentro de estos genes. La búsqueda se realizó de uno en uno y se mantuvo un registro de las veces en las que cada secuencia apareció y en qué genes de acuerdo con el número de gen asignado.  Si bien algunas lecturas fueron identificadas manualmente, otras se encontraron directamente en el archivo mediante el uso de la herramienta de búsqueda en el documento pdf. 
+
+![Figura 1-2. Simulación de la secuenciación]()
+
+
+##Resultados
+
+
+
+```{r pressure, echo=FALSE}
+
+
+
+```
+
+##Discusión 
+
